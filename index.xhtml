@@ -1,0 +1,72 @@
+<html>
+  <head>
+    <title>Huwaaaw, Uleng</title>
+    <style type="text/css">
+      body { background-color: #000; color: #FF0;}
+      #contents {margin-top:10px;}
+      #contents .entry {
+        background-color: #FF0;
+        color: #000;
+        border-radius: 10px;
+        padding: 2px;
+        margin-top: 5px;
+        max-height:60px;
+        overflow:hidden;
+      }
+      #contents .entry a {color:#000;text-decoration:none;}
+      #contents .entry span {float:right; cursor:pointer;}
+    </style>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js" type="text/javascript"></script>
+    <script type="text/javascript">
+      $(document).ready(function() {
+        var ctr = 0;
+        var filter = "";
+        $("#filter").change(function(){
+          console.log("fired");
+          filter = $("#filter").val();
+          $("a").each(function(){
+            text = $(this).html();
+
+            if (text.indexOf(filter) == -1) {
+              $(this).parent().hide("slow");
+            } else {
+              $(this).parent().show("slow");
+            }
+          });
+        });
+
+        var ctr = 0;
+        poll = function(idx) {
+          $.get('/entry/'+idx, function(data){
+            if (data != "") {
+              $("#contents").prepend(data);
+              $("a").each(function(){
+                text = $(this).html();
+                if (text.indexOf(filter) == -1) {
+                  $(this).parent().hide();
+                } else {
+                  $(this).parent().show();
+                }
+              });
+              if ($("#contents").children().size() != 0) {
+                ctr = $("#contents > .entry").first().attr('id').substr(6);
+              }
+              poll(++ctr);
+            } else {
+              setTimeout("poll("+ctr+")",1000);
+            }
+          }, "html");
+        }
+
+        poll(ctr);
+      });
+    </script>
+  </head>
+  <body>
+    <h1>Uleng: Log Filterer </h1>
+    <label for="filter">FILTER:</label>
+    <input id="filter" type="text" />
+    <div id="contents">
+    </div>
+  </body>
+</html>
